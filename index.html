@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Scroll Example</title>
+    <style>
+        /* Some basic styling for demonstration purposes */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <!-- Initial content -->
+        <p>Some initial content here.</p>
+    </div>
+
+    <script>
+        const contentDiv = document.getElementById('content');
+        let page = 1; // Initial page number
+
+        async function loadMoreContent() {
+            console.log('Loading more content...');
+            try {
+                const response = await fetch(`https://jsonplaceholder.typicode.com/posts?_start=${(page-1)*10}&_limit=50`);
+                const data = await response.json();
+                console.log(data);
+                data.forEach(post => {
+                    const newContent = document.createElement('p');
+                    newContent.textContent = post.title;
+                    contentDiv.appendChild(newContent);
+                });
+                page++;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function handleScroll() {
+            const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+                // Load more content when user reaches near the bottom
+                loadMoreContent();
+            }
+        }
+
+        // Attach the scroll event listener
+        window.addEventListener('scroll', handleScroll);
+
+        // Initial load
+        loadMoreContent();
+    </script>
+</body>
+</html>
